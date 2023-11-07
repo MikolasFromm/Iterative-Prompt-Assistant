@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Iterative Prompt Assistant";
+}
+
+<center>
+    <h2 style="padding: 10px">Iterative prompt assistant</h2>
+</center>
+
+<table style="width: 100%">
+    <colgroup>
+        <col span="1" style="width: 10%;">
+        <col span="1" style="width: 90%;">
+    </colgroup>
+    <tbody>
+        <tr>
+            <td style="padding: 5px">Input Fields: </td>
+            <td><input type="file" id="csvFileInput" accept=".csv"></td>
+        </tr>
+        <tr>
+            <td id="UserInputHeading">User query: </td>
+            <td style="padding-bottom: 80px; padding-top: 30px">
+                <div class="inputFieldClass">
+                    <input id="inputField" type="text" oninput="uploadNewUserQuery()" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 5px">Query builder: </td>
+            <td>
+                <div style="position: relative;">
+                    <div class="outputFieldClass"><input id="outputField" type="text" oninput="whisperNextMove()" />
+                    </div>
+                    <div id="dropdown">
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="tableContainer">
+                    <table id="csvTable">
+                        <thead>
+                            <!-- Add table headers here -->
+                        </thead>
+                        <tbody>
+                            <!-- Data rows will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
