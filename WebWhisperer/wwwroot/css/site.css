@@ -1,5 +1,6 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern, clean font */
 }
 
 @media (min-width: 768px) {
@@ -18,11 +19,13 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #f8f9fa; /* Light background for contrast with the table */
+    color: #212529; /* Dark text for readability */
 }
 
 #dropdown div:hover, #dropdown div.selected {
-    background-color: green; /* Change the background color on hover or when selected */
+    background-color: #e9ecef; /* Softer green for hover/selected */
 }
 
 .ai-suggestion {
@@ -44,6 +47,12 @@ body {
     outline: none;
 }
 
+.inputDelimiterFieldClass input {
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #dee2e6; /* Subtle border for minimalism */
+}
+
 .inputFieldClass input {
     width: 100%;
     border: none;
@@ -59,12 +68,49 @@ body {
 
 /* Center the table horizontally within the container */
 #tableContainer {
-    display: flex;
+    /*display: flex;*/
     justify-content: center;
     align-items: center;
-    padding-top: 10vh;
 }
 
-#csvTable {
-    width: 80%; /* Adjust the width as needed */
+/* Custom styles for the table container and table */
+.table-container-class {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-width: 75vw;
+    max-height: 80vh;
+    box-sizing: border-box; /*Ensures padding does not add to the total width */
+    background-color: white; /* Ensures table contrast against body background */
+    border-radius: 8px; /* Rounded corners for the container */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    padding: 1rem; /* Padding inside the container */
+}
+
+.table-container-class table {
+    width: 100%; /* Table width to fill the container */
+    border-collapse: collapse;
+    margin: 0; /* Reset any browser default margin */
+}
+
+.table-container-class th, .table-container-class td {
+    text-align: left; /* Align text to the left for readability */
+    padding: 8px; /* Padding for spacing within cells */
+    border-bottom: 1px solid #dee2e6; /* Subtle border for separation */
+}
+
+.table-container-class th {
+    background-color: #f8f9fa; /* Slightly darker background for headers */
+    color: #495057; /* Dark color for header text */
+}
+
+/* Adjusting input fields for consistency */
+.inputFieldClass input, .outputFieldClass input {
+    width: 100%;
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #dee2e6; /* Subtle border for minimalism */
+}
+
+.inputFieldClass input:focus, .outputFieldClass input:focus, .inputDelimiterFieldClass input:focus {
+    border-bottom: 2px solid #258cfb; /* Highlight focus with color */
 }

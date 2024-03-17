@@ -148,7 +148,22 @@ async function fetchAndDisplayTable() {
 async function sendCsvFileToServer(file) {
     try {
         const formData = new FormData();
+        // Add the selected file to the formData
         formData.append("csvFile", file);
+
+        // Retrieve the delimiter specified by the user
+        const delimiter = document.getElementById("csvFileDelimiter").value.trim();
+
+        // Check if the delimiter is provided
+        if (!delimiter) {
+            // Show an error message to the user and stop execution
+            console.error('Delimiter is required to upload CSV file.');
+            alert('Please specify a delimiter.'); // Using alert for simplicity
+            return; // Stop the function execution here
+        }
+
+        // Add the delimiter to the formData
+        formData.append("delimiter", delimiter);
 
         const response = await fetch('/api/whisper/uploadCsv', {
             method: 'POST',
@@ -168,7 +183,7 @@ async function sendCsvFileToServer(file) {
     }
 }
 
-// Function to parse CSV and populate the table
+// Function to parse CSV and populate the table using PapaParse
 function populateCsvTable(csvData) {
     const table = document.getElementById("csvTable");
     const tbody = table.querySelector("tbody");
@@ -178,30 +193,38 @@ function populateCsvTable(csvData) {
     tbody.innerHTML = '';
     thead.innerHTML = '';
 
-    // Split CSV data into rows
-    const rows = csvData.split("\n");
-
-    // Create table headers
-    const headers = rows[0].split(",");
-
-    // Create a separate table header for each column
-    const headerRow = document.createElement("tr");
-    headers.forEach((headerText) => {
-        const th = document.createElement("th");
-        th.textContent = headerText;
-        headerRow.appendChild(th);
-        thead.appendChild(headerRow);
+    // Parse CSV data
+    const parsedData = Papa.parse(csvData, {
+        skipEmptyLines: true,
+        header: true
     });
 
-    // Create table rows and cells
-    for (let i = 1; i < rows.length; i++) {
-        const rowData = rows[i].split(",");
+    // Check if CSV data has headers
+    const firstline = parsedData.data[0];
+    // if of type object, then it has headers
+    typeof firstline === 'array' ? hasHeaders = false : hasHeaders = true;
+
+    // Create table headers if CSV has headers
+    if (hasHeaders) {
+        const headerRow = document.createElement("tr");
+        for (const key in firstline) {
+            const th = document.createElement("th");
+            th.textContent = key;
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+        // Remove the header row from data
+        parsedData.data.shift();
+    }
+
+    // Create table rows and cells from parsed CSV data
+    for (const rowData of parsedData.data) {
         const row = document.createElement("tr");
-        rowData.forEach((cellData) => {
+        for (const key in rowData) {
             const cell = document.createElement("td");
-            cell.textContent = cellData;
+            cell.textContent = rowData[key];
             row.appendChild(cell);
-        });
+        }
         tbody.appendChild(row);
     }
 }
@@ -261,6 +284,9 @@ document.addEventListener("keydown", (event) => {
             queryBuilder.value = prefix + selectedMove; // Replace existing text after "."
             dropdown.style.display = "none";
         }
+    } else if (event.key === 'Escape') {
+        // Hide the dropdown if ESC key is pressed
+        dropdown.style.display = 'none';
     }
 });
 

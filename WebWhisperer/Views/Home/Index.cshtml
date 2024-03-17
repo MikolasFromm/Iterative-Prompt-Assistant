@@ -2,6 +2,8 @@
     ViewData["Title"] = "Iterative Prompt Assistant";
 }
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.0.2/papaparse.min.js"></script>
+
 <center>
     <h2 style="padding: 10px">Iterative prompt assistant</h2>
 </center>
@@ -15,6 +17,14 @@
         <tr>
             <td style="padding: 5px">Input Fields: </td>
             <td><input type="file" id="csvFileInput" accept=".csv"></td>
+        </tr>
+        <tr>
+            <td style="padding: 5px">Delimiter: </td>
+            <td>
+                <div class="inputDelimiterFieldClass">
+                    <input type="text" id="csvFileDelimiter" />
+                </div>
+            </td>
         </tr>
         <tr>
             <td id="UserInputHeading">User query: </td>
@@ -35,19 +45,15 @@
                 </div>
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                <div id="tableContainer">
-                    <table id="csvTable">
-                        <thead>
-                            <!-- Add table headers here -->
-                        </thead>
-                        <tbody>
-                            <!-- Data rows will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </td>
-        </tr>
     </tbody>
 </table>
+<div style="width: 100%; max-width: 100%" class="table-container-class" id="tableContainer">
+    <table id="csvTable">
+        <thead>
+            <!-- Add table headers here -->
+        </thead>
+        <tbody>
+            <!-- Data rows will be populated here -->
+        </tbody>
+    </table>
+</div>

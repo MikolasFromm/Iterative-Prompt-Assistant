@@ -47,7 +47,7 @@ namespace WebWhisperer.Services
             // process the query
             List<string> splittedQuerySoFar = querySoFar.Split(querySeparator, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            var response = _queryAgent.ServerLikePerformQueryWithIndices(splittedQuerySoFar, _inputFields);
+            var response = _queryAgent.PerformQuerying(splittedQuerySoFar, _inputFields);
 
             // place the suggestion to the first place
             

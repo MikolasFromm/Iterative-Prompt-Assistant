@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using WebWhisperer.IterativePromptCore.Parser;
 using WebWhisperer.Services;
 
@@ -54,21 +55,20 @@ namespace WebWhisperer.Controllers
         [Route("getCurrent")]
         public ActionResult GetCurrentTable()
         {
-            // Call your service to get the current table data
-            string csvData = _whisperService.GetCurrentTable(); // You need to implement this method in your service
+            // Call to get the current table data
+            string csvData = _whisperService.GetCurrentTable();
 
             if (string.IsNullOrEmpty(csvData))
             {
-                return NotFound(); // Return an appropriate response if the data is not found
+                return NotFound();
             }
 
-            // Assuming you want to return the CSV data as plain text
-            return Content(csvData, "text/plain");
+            return File(Encoding.UTF8.GetBytes(csvData), "text/plain; charset=UTF-8");
         }
 
         [HttpPost]
         [Route("uploadCsv")]
-        public IActionResult UploadCsvFile([FromForm] IFormFile csvFile)
+        public IActionResult UploadCsvFile([FromForm] IFormFile csvFile, [FromForm] string delimiter)
         {
             if (csvFile == null || csvFile.Length == 0)
             {
@@ -79,7 +79,7 @@ namespace WebWhisperer.Controllers
             {
                 using (var fileStream = csvFile.OpenReadStream())
                 {
-                    var fields = CsvParser.ParseCsvFile(fileStream);
+                    var fields = CsvParser.ParseCsvFile(fileStream, delimiter);
 
                     _whisperService.LoadInputFields(fields);
                 }
