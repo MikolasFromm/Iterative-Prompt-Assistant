@@ -60,7 +60,9 @@ namespace WebWhisperer.Services
             var response = _queryAgent.PerformQuerying(splittedQuerySoFar, _inputFields);
 
             // place the suggestion to the first place
-            
+
+            _transformations = response.Transformations;
+
             if (response.BotSuggestionIndex > 0 && response.BotSuggestionIndex <  response.NextMoves.Count())
             {
                 var nextMovesList = response.NextMoves.ToList();
@@ -70,7 +72,7 @@ namespace WebWhisperer.Services
                 return nextMovesList;
             }
 
-            _transformations = response.Transformations;
+            
             return response.NextMoves;
         }
 
