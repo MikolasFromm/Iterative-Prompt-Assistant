@@ -38,9 +38,6 @@ namespace WebWhisperer.Controllers
             if (!_whisperService.IsIntputFieldLoaded)
                 return BadRequest("Input fields are not loaded");
 
-            if (string.IsNullOrEmpty(querySoFar))
-                _whisperService.StartNewConversation();
-
             List<string> whisperText = _whisperService.ProcessInput(querySoFar).ToList();
             return Ok(whisperText);
         }
@@ -66,6 +63,14 @@ namespace WebWhisperer.Controllers
             }
 
             return File(Encoding.UTF8.GetBytes(csvData), "text/plain; charset=UTF-8");
+        }
+
+        [HttpGet]
+        [Route("startNewQuery")]
+        public ActionResult StartNewQuery()
+        {
+            _whisperService.StartNewConversation();
+            return Ok();
         }
 
         [HttpPost]

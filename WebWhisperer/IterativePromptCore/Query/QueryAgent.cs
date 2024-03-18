@@ -117,6 +117,9 @@ namespace WebWhisperer.IterativePromptCore.Query
                 Console.WriteLine($"---> Query: {querySoFar}");
             }
 
+            // always remove the history of the previous query
+            _communicationAgent.FlushCurrentChat();
+
             while (queryItems.Any() || firstQueryItem)
             {
                 totalStepsMade = 0;
