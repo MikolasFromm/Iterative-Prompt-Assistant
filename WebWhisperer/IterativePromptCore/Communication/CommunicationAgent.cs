@@ -104,6 +104,14 @@ namespace WebWhisperer.IterativePromptCore.Communication
                 Console.WriteLine($"User input: {userQuery}");
         }
 
+        /// <summary>
+        /// Removes the current chat and creates a new one.
+        /// </summary>
+        public void FlushCurrentChat()
+        {
+            CrateNewChat();
+        }
+
         private void CrateNewChat()
         {
             if (_api is not null)

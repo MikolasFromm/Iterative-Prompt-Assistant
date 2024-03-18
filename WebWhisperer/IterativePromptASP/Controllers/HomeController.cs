@@ -38,6 +38,8 @@ namespace WebWhisperer.Controllers
             if (!_whisperService.IsIntputFieldLoaded)
                 return BadRequest("Input fields are not loaded");
 
+            if (string.IsNullOrEmpty(querySoFar))
+                _whisperService.StartNewConversation();
 
             List<string> whisperText = _whisperService.ProcessInput(querySoFar).ToList();
             return Ok(whisperText);

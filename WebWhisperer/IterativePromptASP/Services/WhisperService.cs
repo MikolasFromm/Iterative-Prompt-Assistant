@@ -32,6 +32,16 @@ namespace WebWhisperer.Services
         }
 
         /// <summary>
+        /// Resets the query and starts a new conversation.
+        /// </summary>
+        public void StartNewConversation()
+        {
+            _querySoFar = string.Empty;
+            _transformations = new List<ITransformation>();
+            _queryAgent.StartNewQueryAttempt();
+        }
+
+        /// <summary>
         /// Every change in queryBuilder invokes new transformation build, allowing to build the query step by step, but also remove and edit the previous steps.
         /// </summary>
         /// <param name="querySoFar"></param>

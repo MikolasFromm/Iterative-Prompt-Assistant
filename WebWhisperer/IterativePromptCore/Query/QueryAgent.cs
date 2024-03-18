@@ -82,6 +82,15 @@ namespace WebWhisperer.IterativePromptCore.Query
         }
 
         /// <summary>
+        /// When user starts a new query, the current chat must be flushed so that the context is not mixed with the previous query.
+        /// </summary>
+        public void StartNewQueryAttempt()
+        {
+            if (_communicationAgent is not null)
+                _communicationAgent.FlushCurrentChat();
+        }
+
+        /// <summary>
         /// Sequentially builds the transformations based on the query built so far. 
         /// After any input, the "nextMoves" is saved in order to return the current next moves when whole query performed. 
         /// Using <see cref="CommunicationAgent"/> for comunication with user/bot.
