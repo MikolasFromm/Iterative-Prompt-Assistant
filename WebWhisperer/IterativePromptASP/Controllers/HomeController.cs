@@ -43,7 +43,7 @@ namespace WebWhisperer.Controllers
         }
 
         [HttpPost]
-        [Route("upload")]
+        [Route("upload-user-input")]
         public ActionResult LoadUserInput([FromBody] string userInput)
         {
             _whisperService.LoadUserInput(userInput);
@@ -51,7 +51,7 @@ namespace WebWhisperer.Controllers
         }
 
         [HttpGet]
-        [Route("getCurrent")]
+        [Route("get-current")]
         public ActionResult GetCurrentTable()
         {
             // Call to get the current table data
@@ -65,16 +65,8 @@ namespace WebWhisperer.Controllers
             return File(Encoding.UTF8.GetBytes(csvData), "text/plain; charset=UTF-8");
         }
 
-        [HttpGet]
-        [Route("startNewQuery")]
-        public ActionResult StartNewQuery()
-        {
-            _whisperService.StartNewConversation();
-            return Ok();
-        }
-
         [HttpPost]
-        [Route("uploadCsv")]
+        [Route("upload-csv")]
         public IActionResult UploadCsvFile([FromForm] IFormFile csvFile, [FromForm] string delimiter)
         {
             if (csvFile == null || csvFile.Length == 0)

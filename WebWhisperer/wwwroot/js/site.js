@@ -22,7 +22,7 @@ async function uploadNewUserQuery() {
     // when user input ends with ".", send it to the server
     if (lastChar === ".") {
         // Send the user input to the server
-        await fetch('/api/whisper/upload', {
+        await fetch('/api/whisper/upload-user-input', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ async function whisperNextMove() {
 async function fetchAndDisplayTable() {
     try
     {
-        const response = await fetch('/api/whisper/getCurrent', {
+        const response = await fetch('/api/whisper/get-current', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -165,7 +165,7 @@ async function sendCsvFileToServer(file) {
         // Add the delimiter to the formData
         formData.append("delimiter", delimiter);
 
-        const response = await fetch('/api/whisper/uploadCsv', {
+        const response = await fetch('/api/whisper/upload-csv', {
             method: 'POST',
             body: formData,
         });
