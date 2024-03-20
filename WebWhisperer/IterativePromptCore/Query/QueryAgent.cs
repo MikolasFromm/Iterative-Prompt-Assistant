@@ -5,13 +5,13 @@ using WebWhisperer.IterativePromptCore.Types;
 
 namespace WebWhisperer.IterativePromptCore.Query
 {
-    public class QueryAgent
+    public class QueryAgent : IQueryAgent
     {
         private ICommunicationAgent _communicationAgent;
 
         private List<EmptyField> _response = new List<EmptyField>();
 
-        private IEnumerable<ITransformation> possibleTransformations = new List<ITransformation>()
+        private IEnumerable<ITransformation> _possibleTransformations = new List<ITransformation>()
         {
             new EmptyTransformation(),
             new DropColumnTransformation(),
@@ -69,32 +69,18 @@ namespace WebWhisperer.IterativePromptCore.Query
 
         #endregion
 
-        /// <summary>
-        /// Mirror of a <see cref="CommunicationAgent"/> method to make it public for <see cref="QueryAgent"/> class. A legal way to create a new user query.
-        /// </summary>
-        /// <param name="userQuery"></param>
         public void AddUserQuery(string userQuery = null)
         {
             if (_communicationAgent is not null)
                 _communicationAgent.AddUserQuery(userQuery);
         }
 
-        /// <summary>
-        /// When user starts a new query, the current chat must be flushed so that the context is not mixed with the previous query.
-        /// </summary>
         public void StartNewQueryAttempt()
         {
             if (_communicationAgent is not null)
                 _communicationAgent.FlushCurrentChat();
         }
 
-        /// <summary>
-        /// Sequentially builds the transformations based on the query built so far. 
-        /// After any input, the "nextMoves" is saved in order to return the current next moves when whole query performed. 
-        /// Using <see cref="CommunicationAgent"/> for comunication with user/bot.
-        /// Instead of asking for choosing the next transformation by name, it uses the index of the transformation in the list.
-        /// </summary>
-        /// <returns></returns>
         public QueryViewModel PerformQuerying(IList<string> queryItems, IList<Field> fields)
         {
             // refresh with the initial table
@@ -130,7 +116,7 @@ namespace WebWhisperer.IterativePromptCore.Query
                     string secondArgument = string.Empty;
 
                     // Print all possible transformations
-                    responseQueryModel.NextMoves = _communicationAgent.CreateNextQuestion($"---> Choose next transformation: ", from transformation in possibleTransformations select $"{transformation.GetTransformationName()}");
+                    responseQueryModel.NextMoves = _communicationAgent.CreateNextQuestion($"---> Choose next transformation: ", from transformation in _possibleTransformations select $"{transformation.GetTransformationName()}");
 
                     // dont skip the previous queryItem when at the beginning
                     if (!firstQueryItem)
@@ -158,7 +144,7 @@ namespace WebWhisperer.IterativePromptCore.Query
                     }
 
                     // Check if the number is in range
-                    if (transformationIndex >= possibleTransformations.Count())
+                    if (transformationIndex >= _possibleTransformations.Count())
                     {
                         _communicationAgent.ErrorMessage($"Invalid input out of range. You must choose from the selection above. Please try again.");
                         _communicationAgent.Indent();

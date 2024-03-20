@@ -12,7 +12,7 @@ namespace WebWhisperer.Services
 
         private char querySeparator = '.';
 
-        private QueryAgent _queryAgent;
+        private IQueryAgent _queryAgent;
         private List<Field> _inputFields;
         private IEnumerable<ITransformation> _transformations;
 
