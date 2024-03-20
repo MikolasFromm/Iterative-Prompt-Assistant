@@ -6,7 +6,7 @@ using WebWhisperer.IterativePromptCore.Types;
 
 namespace WebWhisperer.IterativePromptCore.Communication
 {
-    public class CommunicationAgent
+    public class CommunicationAgent : ICommunicationAgent
     {
         private CommunicationAgentMode _mode;
 
@@ -81,10 +81,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
 #endif
         }
 
-        /// <summary>
-        /// Adds a user query to the chatBot. If no query is given, it prompts the user for input.
-        /// </summary>
-        /// <param name="userQuery"></param>
         public void AddUserQuery(string userQuery = null)
         {
 
@@ -104,9 +100,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
                 Console.WriteLine($"User input: {userQuery}");
         }
 
-        /// <summary>
-        /// Removes the current chat and creates a new one.
-        /// </summary>
         public void FlushCurrentChat()
         {
             CrateNewChat();
@@ -123,9 +116,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             }
         }
 
-        /// <summary>
-        /// Returns the current chatBot verbose setting.
-        /// </summary>
         public bool Verbose { get { return _verbose; } }
 
         /// <summary>
@@ -152,15 +142,8 @@ namespace WebWhisperer.IterativePromptCore.Communication
             _verbose = verbose;
         }
 
-        /// <summary>
-        /// Represents current class setting status
-        /// </summary>
         public CommunicationAgentMode Mode { get { return _mode; } }
 
-        /// <summary>
-        /// Add (system) message to the conversation.
-        /// </summary>
-        /// <param name="message"></param>
         public string InsertSystemMessage(string message)
         {
             if (_verbose)
@@ -172,10 +155,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             return message;
         }
 
-        /// <summary>
-        /// Adds user input to the system conversation. Relevant only for AIBot mode.
-        /// </summary>
-        /// <param name="message"></param>
         public string InsertUserMessage(string message)
         {
             if (_verbose)
@@ -189,31 +168,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             return message;
         }
 
-        /// <summary>
-        /// Inserts next possible arguments to the conversation. Relevant only for AIBot mode.
-        /// For WebWhisper, it is used to insert the next possible arguments to the user input.
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public IEnumerable<string> InsertNextPossibleArguments(IEnumerable<string> args)
-        {
-            if (_mode == CommunicationAgentMode.AIBot || _mode == CommunicationAgentMode.AIBotWebWhisper)
-            {
-                foreach (var arg in args)
-                {
-                    InsertUserMessage($"> {arg}");
-                }
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Creates a next question and saves it until the AI Bot is asked to produce response.
-        /// </summary>
-        /// <param name="question"></param>
-        /// <param name="possibleChoices"></param>
-        /// <returns></returns>
         public IEnumerable<string> CreateNextQuestion(string question, IEnumerable<string> possibleChoices = null)
         {
 
@@ -236,27 +190,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             return possibleChoices;
         }
 
-        /// <summary>
-        /// Inserts next possible arguments to the conversation. Relevant only for AIBot mode.
-        /// For WebWhisper, it is used to insert the next possible arguments to the user input.
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public IEnumerable<string> InsertNextPossibleArgumentsWithIndices(IEnumerable<string> args)
-        {
-            int i = 0;
-            foreach (var arg in args)
-            {
-                InsertUserMessage($"> [{i++}] {arg}");
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Default Error message "stream". Verbose independent
-        /// </summary>
-        /// <param name="message"></param>
         public string ErrorMessage(string message)
         {
             if (_mode == CommunicationAgentMode.User)
@@ -268,10 +201,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             return message;
         }
 
-        /// <summary>
-        /// Get response to the given query. If userMode set, content from <see cref="Console"/> will be given.
-        /// </summary>
-        /// <returns></returns>
         public string GetResponse(string querySoFar = null, string nextMove = null, int nextMoveIndex = -1, bool isUserInputExpected = false)
         {
             if (_mode == CommunicationAgentMode.User)
@@ -351,9 +280,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             return string.Empty;
         }
 
-        /// <summary>
-        /// Show the whole conversation history with chatbot.
-        /// </summary>
         public void ShowConversationHistory()
         {
             if (_mode == CommunicationAgentMode.AIBot || _mode == CommunicationAgentMode.AIBotWebWhisper)
@@ -368,9 +294,6 @@ namespace WebWhisperer.IterativePromptCore.Communication
             }
         }
 
-        /// <summary>
-        /// New-line indenting for more readable output. Relevant only for VERBOSE mode.
-        /// </summary>
         public void Indent()
         {
             if (_mode == CommunicationAgentMode.AIBot || _mode == CommunicationAgentMode.AIBotWebWhisper)

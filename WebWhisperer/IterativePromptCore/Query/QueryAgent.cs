@@ -7,11 +7,9 @@ namespace WebWhisperer.IterativePromptCore.Query
 {
     public class QueryAgent
     {
-        private CommunicationAgent _communicationAgent;
+        private ICommunicationAgent _communicationAgent;
 
         private List<EmptyField> _response = new List<EmptyField>();
-
-        private List<ITransformation> _transformations { get; set; } = new List<ITransformation>();
 
         private IEnumerable<ITransformation> possibleTransformations = new List<ITransformation>()
         {
