@@ -17,10 +17,10 @@ namespace WebWhisperer.IterativePromptCore.Types
                 select cell.Index;
             var indexesList = indexes.ToList();
 
-            // set the default indexing
-            int index = 0;
-            foreach (var cell in cells)
-                cell.Index = index++;
+            //// set the default indexing
+            //int index = 0;
+            //foreach (var cell in cells)
+            //    cell.Index = index++;
 
             // return the permutation of the old indices
             return indexesList;
@@ -71,6 +71,11 @@ namespace WebWhisperer.IterativePromptCore.Types
                     }
                     fieldList[i] = newField;
                 }
+
+                // set the default indexing
+                int cell_index = 0;
+                foreach (var cell in fieldList[i].Data)
+                    cell.Index = cell_index++;
             }
             return fieldList;
         }
