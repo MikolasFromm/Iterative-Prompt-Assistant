@@ -22,7 +22,6 @@ namespace WebWhisperer.IterativePromptCore.Types
             //foreach (var cell in cells)
             //    cell.Index = index++;
 
-            // return the permutation of the old indices
             return indexesList;
         }
 
@@ -525,8 +524,8 @@ namespace WebWhisperer.IterativePromptCore.Types
                 var grouped_cells =
                     from cell in field.Data
                     where StringsToGroup.Contains(cell.Content)
-                    group cell by cell.Content into newGroup
-                    orderby newGroup.Key
+                     group cell by cell.Content into newGroup
+                     orderby newGroup.Key
                     select newGroup.ToList();
 
                 // create one list from the groups
