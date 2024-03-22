@@ -111,7 +111,7 @@ namespace WebWhisperer.IterativePromptCore.Communication
             {
                 _chat = _api.Chat.CreateConversation();
                 _chat.RequestParameters.TopP = 0.0;
-                _chat.RequestParameters.Model = OpenAI_API.Models.Model.ChatGPTTurbo0301;
+                _chat.RequestParameters.Model = OpenAI_API.Models.Model.GPT4;
                 BotIntroduction();
             }
         }
