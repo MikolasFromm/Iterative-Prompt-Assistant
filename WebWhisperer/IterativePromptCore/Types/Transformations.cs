@@ -657,15 +657,6 @@ namespace WebWhisperer.IterativePromptCore.Types
             if (index < 0 || index >= _argumentsList.Count)
                 throw new ArgumentOutOfRangeException($"Index \"{index}\" in {nameof(GetArgumentAt)} out of range");
 
-            //if (index == 0 // Sum
-            //    || index == 1 // Avg
-            //    || index == 2 // Concat
-            //    || index == 4 // CountAll
-            //    || index == 5) // GroupKey
-            //{
-            //    HasFollowingHumanArguments = true;
-            //}
-
             return _argumentsList[index];
         }
 
