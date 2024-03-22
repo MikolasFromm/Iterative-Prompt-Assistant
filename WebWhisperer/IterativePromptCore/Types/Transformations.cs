@@ -639,7 +639,7 @@ namespace WebWhisperer.IterativePromptCore.Types
                     foreach (var field in list)
                         field.Header.Type = FieldDataType.Number;
                     return list;
-                case Agregation.GroupKey:
+                //case Agregation.GroupKey:
                 case Agregation.ConcatValues:
                     return list;
 
