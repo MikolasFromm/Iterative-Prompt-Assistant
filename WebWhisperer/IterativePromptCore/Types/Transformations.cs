@@ -54,11 +54,11 @@ namespace WebWhisperer.IterativePromptCore.Types
         /// <param name="fieldToIgnore"></param>
         /// <param name="indexes"></param>
         /// <returns><see cref="List{Field}"/> collection of rearranged Fields.</returns>
-        public static List<Field> ReArrangeAndSelectByIndex(this List<Field> fieldList, Header fieldToIgnore, IEnumerable<int> indexes)
+        public static List<Field> ReArrangeAndSelectByIndex(this List<Field> fieldList, IEnumerable<int> indexes, Header? fieldToIgnore = null)
         {
             for (int i = 0; i < fieldList.Count; i++)
             {
-                if (fieldList[i].Header != fieldToIgnore)
+                if (fieldToIgnore is null || fieldList[i].Header != fieldToIgnore)
                 {
                     Field newField = new() { Header = fieldList[i].Header };
                     int newIndex = 0;
@@ -438,7 +438,8 @@ namespace WebWhisperer.IterativePromptCore.Types
             if (source_field is not null)
             {
                 var indexes = source_field.SortAndGetIndexes(Direction); // sort the given field and get the sorted indices
-                return input_fields.ReArrangeAndSelectByIndex(source_field.Header, indexes); // re-arrange all fields by the sorted indices and ignore the one already sorted
+
+                return input_fields.ReArrangeAndSelectByIndex(indexes, source_field.Header); // re-arrange all fields by the sorted indices and ignore the one already sorted
             }
             else
             {
@@ -483,9 +484,9 @@ namespace WebWhisperer.IterativePromptCore.Types
     {
         public bool HasArguments => true;
 
-        public bool HasFollowingHumanArguments { get; set; } // might be true if the arguments requires so
+        public bool HasFollowingHumanArguments { get; set; } = false; // might be true if the arguments requires so
 
-        public int TotalStepsNeeded => 3;
+        public int TotalStepsNeeded => 2;
 
         public TransformationType Type => TransformationType.GroupBy;
 
@@ -517,118 +518,96 @@ namespace WebWhisperer.IterativePromptCore.Types
 
         public List<Field> PerformTransformation(List<Field> fields)
         {
-            Field? field = fields.FirstOrDefault(x => x.Header.Name == TargetHeaderName);
-            if (field is not null)
+            Field? targetField = fields.FirstOrDefault(x => x.Header.Name == TargetHeaderName);
+            if (targetField is null) throw new ArgumentException("Field to GroupBy not found.");
+
+
+            // Identifying groups in the target field
+            var groups = targetField.Data
+                .GroupBy(cell => cell.Content)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            // Initialize a new list for transformed fields
+            List<Field> transformedFields = new List<Field>();
+
+            foreach (var currentField in fields)
             {
-                // create groups
-                var grouped_cells =
-                    from cell in field.Data
-                    where StringsToGroup.Contains(cell.Content)
-                     group cell by cell.Content into newGroup
-                     orderby newGroup.Key
-                    select newGroup.ToList();
 
-                // create one list from the groups
-                var grouped = new List<Cell>();
-                int rowIndex = 0;
-                switch (GroupAgregation)
+                Field transformedField = new Field
                 {
-                    case Agregation.GroupKey:
-                        throw new NotImplementedException();
-                        break;
+                    Header = currentField.Header,
+                    Data = new List<Cell>()
+                };
 
-                    case Agregation.CountAll:
-                        foreach (var group in grouped_cells)
-                        {
-                            int count = 0;
-                            foreach (var item in group)
-                            {
-                                count += 1;
-                            }
-                            grouped.Add(new Cell() { Content = count.ToString(), Index = rowIndex });
-                            rowIndex++;
-                        }
-                        field.Data = grouped;
-                        field.Header.Type = FieldDataType.Number;
-                        break;
+                int rowIndex = 0;
 
-                    case Agregation.CountDistinct:
-                        HashSet<string> values = new();
-                        foreach (var group in grouped_cells)
-                        {
-                            int count = 0;
-                            foreach (var item in group)
-                            {
-                                if (!values.Contains(item.Content))
-                                {
-                                    count++;
-                                    values.Add(item.Content);
-                                }
-                            }
-                            grouped.Add(new Cell() { Content = count.ToString(), Index = rowIndex });
-                            rowIndex++;
-                        }
-                        field.Data = grouped;
-                        field.Header.Type = FieldDataType.Number;
-                        break;
-
-                    case Agregation.ConcatValues:
-                        foreach (var group in grouped_cells)
-                            grouped.Concat(group);
-                        field.Data = grouped;
-                        break;
-
-                    case Agregation.Sum:
-                        foreach (var group in grouped_cells)
-                        {
-                            double sum = 0;
-                            foreach (var item in group)
-                            {
-                                if (int.TryParse(item.Content, out int num))
-                                {
-                                    sum += num;
-                                }
-                            }
-                            grouped.Add(new Cell() { Content = sum.ToString(), Index = rowIndex });
-                            rowIndex++;
-                        }
-                        field.Data = grouped;
-                        field.Header.Type = FieldDataType.Number;
-                        break;
-
-                    case Agregation.Mean:
-                        foreach (var group in grouped_cells)
-                        {
-                            double mean = 0;
-                            uint count = 0;
-                            foreach (var item in group)
-                            {
-                                if (int.TryParse(item.Content, out int num))
-                                {
-                                    mean = mean * count / (count + 1) + num / count + 1; // rolling average
-                                    count++;
-                                }
-                            }
-                            grouped.Add(new Cell() { Content = mean.ToString(), Index = rowIndex });
-                            rowIndex++;
-                        }
-                        break;
-                    default:
-                        throw new ArgumentNullException("GroupAgregation in GroupBy transformation not set");
+                // If the current field is the target grouping field, handle it specifically
+                if (currentField.Header.Name == TargetHeaderName)
+                {
+                    foreach (var groupKey in groups.Keys)
+                    {
+                        transformedField.Data.Add(new Cell { Content = groupKey, Index = rowIndex++ });
+                    }
+                    // Add the transformed field for the grouping column and skip the aggregation logic
+                    transformedFields.Add(transformedField);
+                    continue; // Move to the next field without entering the aggregation logic
                 }
 
-                // ReArrange the fields that are left
-                var indexes = field.Data.GetIndexes();
-                return fields.ReArrangeAndSelectByIndex(field.Header, indexes);
+                // Aggregation logic
+                foreach (var group in groups)
+                {
+                    var cells = group.Value.GetIndexes()
+                        .Select(index => currentField.Data[index])
+                        .ToList();
+
+                    switch (GroupAgregation)
+                    {
+                        case Agregation.CountAll:
+                            int countAll = cells.Count;
+                            transformedField.Data.Add(new Cell { Content = countAll.ToString(), Index = rowIndex++ });
+                            break;
+
+                        case Agregation.CountDistinct:
+                            int countDistinct = cells.Select(cell => cell.Content).Distinct().Count();
+                            transformedField.Data.Add(new Cell { Content = countDistinct.ToString(), Index = rowIndex++ });
+                            break;
+
+                        case Agregation.ConcatValues:
+                            string concatValues = string.Join(", ", cells.Select(cell => cell.Content));
+                            transformedField.Data.Add(new Cell { Content = concatValues, Index = rowIndex++ });
+                            break;
+
+                        case Agregation.Sum:
+                            double sum = cells
+                                .Where(cell => double.TryParse(cell.Content, out double _))
+                                .Sum(cell => double.Parse(cell.Content));
+                            transformedField.Data.Add(new Cell { Content = sum.ToString(), Index = rowIndex++ });
+                            break;
+
+                        case Agregation.Mean:
+                            var validNumbers = cells
+                                .Select(cell => double.TryParse(cell.Content, out double num) ? num : (double?)null)
+                                .Where(num => num.HasValue)
+                                .Select(cell => cell.Value)
+                                .ToList();
+                            double mean = validNumbers.Any() ? validNumbers.Average() : 0;
+                            transformedField.Data.Add(new Cell { Content = mean.ToString("F2"), Index = rowIndex++ }); // "F2" for two decimal places
+                            break;
+
+                        default:
+                            throw new NotImplementedException($"Aggregation {GroupAgregation} not implemented.");
+                    }
+                }
+                transformedFields.Add(transformedField);
             }
-            else
-            {
-                throw new ArgumentException("Field to GroupBy not found.");
-            }
+
+            // Return the transformed fields with adjusted rows per aggregation logic
+            return transformedFields;
         }
 
         public List<EmptyField> Preprocess(List<EmptyField> list)
         {
+            var preprocessed = new List<EmptyField>();
             switch (GroupAgregation)
             {
                 case Agregation.CountAll:
@@ -636,11 +615,19 @@ namespace WebWhisperer.IterativePromptCore.Types
                 case Agregation.Sum:
                 case Agregation.Mean:
                     foreach (var field in list)
-                        field.Header.Type = FieldDataType.Number;
-                    return list;
+                    {
+                        preprocessed.Add(new EmptyField 
+                        {
+                            Header = new Header(
+                                field.Header.Name,
+                                FieldDataType.Number,
+                                field.Header.Index)
+                        });
+                    }
+                    return preprocessed;
                 //case Agregation.GroupKey:
                 case Agregation.ConcatValues:
-                    return list;
+                    return preprocessed;
 
                 default:
                     throw new ArgumentException("Unknown Agregation");
@@ -670,14 +657,14 @@ namespace WebWhisperer.IterativePromptCore.Types
             if (index < 0 || index >= _argumentsList.Count)
                 throw new ArgumentOutOfRangeException($"Index \"{index}\" in {nameof(GetArgumentAt)} out of range");
 
-            if (index == 0 // Sum
-                || index == 1 // Avg
-                || index == 2 // Concat
-                || index == 4 // CountAll
-                || index == 5) // GroupKey
-            {
-                HasFollowingHumanArguments = true;
-            }
+            //if (index == 0 // Sum
+            //    || index == 1 // Avg
+            //    || index == 2 // Concat
+            //    || index == 4 // CountAll
+            //    || index == 5) // GroupKey
+            //{
+            //    HasFollowingHumanArguments = true;
+            //}
 
             return _argumentsList[index];
         }
@@ -714,36 +701,20 @@ namespace WebWhisperer.IterativePromptCore.Types
                 switch (FilterCondition.Relation)
                 {
                     case Relation.Equals:
-
-                        var eq_result = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) == 0 select cell;
-                        field.Data = eq_result.ToList();
-                        var eq_indexes = field.Data.GetIndexes();
-                        fields.ReArrangeAndSelectByIndex(field.Header, eq_indexes);
-                        return fields;
+                        var eq_indexes = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) == 0 select cell.Index;
+                        return fields.ReArrangeAndSelectByIndex(eq_indexes);
 
                     case Relation.NotEquals:
-
-                        var neq_result = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) != 0 select cell;
-                        field.Data = neq_result.ToList();
-                        var neq_indexes = field.Data.GetIndexes();
-                        fields.ReArrangeAndSelectByIndex(field.Header, neq_indexes);
-                        return fields;
+                        var neq_indexes = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) != 0 select cell.Index;
+                        return fields.ReArrangeAndSelectByIndex(neq_indexes);
 
                     case Relation.LessThan:
-
-                        var lt_result = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) < 0 select cell;
-                        field.Data = lt_result.ToList();
-                        var lt_indexes = field.Data.GetIndexes();
-                        fields.ReArrangeAndSelectByIndex(field.Header, lt_indexes);
-                        return fields;
+                        var lt_indexes = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) < 0 select cell.Index;
+                        return fields.ReArrangeAndSelectByIndex(lt_indexes); ;
 
                     case Relation.GreaterThan:
-
-                        var gt_result = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) > 0 select cell;
-                        field.Data = gt_result.ToList();
-                        var gt_indexes = field.Data.GetIndexes();
-                        fields.ReArrangeAndSelectByIndex(field.Header, gt_indexes);
-                        return fields;
+                        var gt_indexes = from cell in field.Data where cell.CompareTo_TypeDependent(field.Header.Type, FilterCondition.Condition) > 0 select cell.Index;
+                        return fields.ReArrangeAndSelectByIndex(gt_indexes); ;
 
                     case Relation.InRange:
                         throw new NotImplementedException("Relation.InRange not implemented");
@@ -795,11 +766,13 @@ namespace WebWhisperer.IterativePromptCore.Types
     {
         public static List<Field> TransformFields(List<Field> fields, IEnumerable<ITransformation> transformations)
         {
+            var transformedFields = new List<Field>(fields);
+
             foreach (var transformation in transformations)
             {
-                fields = transformation.PerformTransformation(fields);
+                transformedFields = transformation.PerformTransformation(transformedFields);
             }
-            return fields;
+            return transformedFields;
         }
     }
 }

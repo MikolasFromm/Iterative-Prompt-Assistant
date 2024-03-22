@@ -159,6 +159,7 @@ async function sendCsvFileToServer(file) {
             // Show an error message to the user and stop execution
             console.error('Delimiter is required to upload CSV file.');
             alert('Please specify a delimiter.'); // Using alert for simplicity
+            csvFileInput.value = ""
             return; // Stop the function execution here
         }
 
@@ -176,10 +177,13 @@ async function sendCsvFileToServer(file) {
         } else {
             console.error('Failed to upload CSV file:', response.statusText);
             // Handle the error if needed
+            csvFileInput.value = ""
+
         }
     } catch (error) {
         console.error('An error occurred:', error);
         // Handle the error if needed
+        csvFileInput.value = ""
     }
 }
 
@@ -213,8 +217,6 @@ function populateCsvTable(csvData) {
             headerRow.appendChild(th);
         }
         thead.appendChild(headerRow);
-        // Remove the header row from data
-        parsedData.data.shift();
     }
 
     // Create table rows and cells from parsed CSV data
