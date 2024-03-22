@@ -496,7 +496,15 @@ namespace WebWhisperer.IterativePromptCore.Types
 
         public string TargetHeaderName { get; set; }
 
-        private static readonly List<string> _argumentsList = new List<string> { StaticNames.Sum, StaticNames.Average, StaticNames.Concat, StaticNames.CountDistinct, StaticNames.CountAll, StaticNames.GroupKey };
+        private static readonly List<string> _argumentsList = new List<string> 
+        { 
+            StaticNames.Sum, 
+            StaticNames.Average, 
+            StaticNames.Concat, 
+            StaticNames.CountDistinct, 
+            StaticNames.CountAll, 
+            //StaticNames.GroupKey 
+        };
 
         public GroupByTransformation(HashSet<string> stringsToGroup, Agregation groupAgregation, string targetHeaderName)
         {
