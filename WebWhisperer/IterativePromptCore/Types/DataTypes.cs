@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
+using WebWhisperer.IterativePromptCore.Types.Enums;
 
-namespace WebWhisperer.IterativePromptCore.Types
+namespace WebWhisperer.IterativePromptCore.Types.DataTypes
 {
     public class GroupAgregations
     {

@@ -1,8 +1,8 @@
 ﻿using CsvHelper;
-using OpenAI_API.Moderation;
 using System.Globalization;
 using System.Text;
-using WebWhisperer.IterativePromptCore.Types;
+using WebWhisperer.IterativePromptCore.Types.Enums;
+using WebWhisperer.IterativePromptCore.Types.DataTypes;
 
 namespace WebWhisperer.IterativePromptCore.Parser
 {

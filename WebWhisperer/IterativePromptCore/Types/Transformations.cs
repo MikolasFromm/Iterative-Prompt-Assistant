@@ -1,6 +1,9 @@
 ﻿// user_custom definitions
+using WebWhisperer.IterativePromptCore.Types.Enums;
+using WebWhisperer.IterativePromptCore.Types.Statics;
+using WebWhisperer.IterativePromptCore.Types.DataTypes;
 
-namespace WebWhisperer.IterativePromptCore.Types
+namespace WebWhisperer.IterativePromptCore.Types.Transformations
 {
     public static class ListExtensions
     {

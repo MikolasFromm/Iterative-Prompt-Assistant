@@ -1,5 +1,5 @@
 ﻿using WebWhisperer.IterativePromptCore.Model;
-using WebWhisperer.IterativePromptCore.Types;
+using WebWhisperer.IterativePromptCore.Types.DataTypes;
 
 namespace WebWhisperer.IterativePromptCore.Query
 {

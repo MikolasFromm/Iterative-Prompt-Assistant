@@ -1,4 +1,4 @@
-﻿namespace WebWhisperer.IterativePromptCore.Types
+﻿namespace WebWhisperer.IterativePromptCore.Types.Enums
 {
     public enum FieldDataType
     {

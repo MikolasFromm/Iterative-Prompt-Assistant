@@ -1,4 +1,4 @@
-﻿using WebWhisperer.IterativePromptCore.Types;
+﻿using WebWhisperer.IterativePromptCore.Types.Enums;
 
 namespace WebWhisperer.IterativePromptCore.Communication
 {

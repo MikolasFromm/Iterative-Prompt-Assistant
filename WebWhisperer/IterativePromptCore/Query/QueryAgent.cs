@@ -1,7 +1,8 @@
 ﻿using OpenAI_API;
 using WebWhisperer.IterativePromptCore.Communication;
 using WebWhisperer.IterativePromptCore.Model;
-using WebWhisperer.IterativePromptCore.Types;
+using WebWhisperer.IterativePromptCore.Types.DataTypes;
+using WebWhisperer.IterativePromptCore.Types.Transformations;
 
 namespace WebWhisperer.IterativePromptCore.Query
 {

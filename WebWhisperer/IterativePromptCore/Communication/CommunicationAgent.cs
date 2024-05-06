@@ -1,8 +1,7 @@
 ﻿#define BRIEF_START
 
 using OpenAI_API;
-using OpenAI_API.Models;
-using WebWhisperer.IterativePromptCore.Types;
+using WebWhisperer.IterativePromptCore.Types.Enums;
 
 namespace WebWhisperer.IterativePromptCore.Communication
 {
