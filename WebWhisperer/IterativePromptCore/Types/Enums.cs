@@ -47,13 +47,11 @@
 
     public enum TransformationType
     {
-        DropColumns,
-        SortBy,
-        Paging,
-        GroupBy,
-        FilterBy,
-        Aggregate,
-        Empty
+        Empty = 0,
+        DropColumns = 1,
+        SortBy = 2,
+        GroupBy = 3,
+        FilterBy = 4
     }
 
     public enum CommunicationAgentMode

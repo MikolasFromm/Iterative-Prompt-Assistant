@@ -95,15 +95,15 @@ namespace WebWhisperer.IterativePromptCore.Types.Transformations
         {
             switch (transformation)
             {
-                case "Empty":
+                case StaticNames.Empty:
                     return new EmptyTransformation();
-                case "DropColumn":
+                case StaticNames.DropColumn:
                     return new DropColumnTransformation();
-                case "SortBy":
+                case StaticNames.SortBy:
                     return new SortByTransformation();
-                case "GroupBy":
+                case StaticNames.GroupBy:
                     return new GroupByTransformation();
-                case "FilterBy":
+                case StaticNames.FilterBy:
                     return new FilterByTransformation();
                 default:
                     throw new ArgumentException("Unknown transformation");
@@ -114,15 +114,15 @@ namespace WebWhisperer.IterativePromptCore.Types.Transformations
         {
             switch (index)
             {
-                case 0:
+                case (int)TransformationType.Empty:
                     return new EmptyTransformation();
-                case 1:
+                case (int)TransformationType.DropColumns:
                     return new DropColumnTransformation();
-                case 2:
+                case (int)TransformationType.SortBy:
                     return new SortByTransformation();
-                case 3:
+                case (int)TransformationType.GroupBy:
                     return new GroupByTransformation();
-                case 4:
+                case (int)TransformationType.FilterBy:
                     return new FilterByTransformation();
                 default:
                     throw new ArgumentException("Unknown transformation");
@@ -761,6 +761,15 @@ namespace WebWhisperer.IterativePromptCore.Types.Transformations
         public static List<Field> TransformFields(List<Field> fields, IEnumerable<ITransformation> transformations)
         {
             var transformedFields = new List<Field>(fields);
+
+            foreach (var field in fields)
+            {
+                int index = 0;
+                foreach (var cell in field.Data)
+                {
+                    cell.Index = index++;
+                }
+            }
 
             foreach (var transformation in transformations)
             {
